@@ -12,7 +12,7 @@ sum_listTR([Top|Tail], Sum, Total) :-
 	TotalNow is Top + Sum,
 	sum_listTR(Tail,TotalNow, Total).
 
-nlist(0,[]) .
+nlist(1,[1]) :- !.
 nlist(N,[N|Ns]) :- N1 is N - 1, nlist(N1, Ns).
 
 sum1(L,R) :- nlist(L,X), sum_list(X,R).
