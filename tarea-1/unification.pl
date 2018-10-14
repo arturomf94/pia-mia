@@ -1,27 +1,27 @@
 %%% UNIFICACION
 
-%%% Caso 1: ambos términos son constantes.
-%%% Esta cláusula prueba si ambos términos son constantes
-%%% También se revisa si hay igualdad entre los términos.
+%%% Caso 1: ambos terminos son constantes.
+%%% Esta clausula prueba si ambos terminos son constantes
+%%% Tambien se revisa si hay igualdad entre los terminos.
 unify(T1, T2) :-
     atomic(T1),
     atomic(T2),
     T1 == T2,
     !.
 
-%%% Caso 2: al menos un término es variable.
-%%% En esta cláusula se verifica si el primer término es
-%%% una variable. También se verifica si hay igualdad
-%%% entre términos.
+%%% Caso 2: al menos un termino es variable.
+%%% En esta clausula se verifica si el primer termino es
+%%% una variable. Tambien se verifica si hay igualdad
+%%% entre terminos.
 unify(T1, T2) :-
     var(T1),
     T1 == T2,
     !.
 
-%%% En esta cláusula se verifica si el primer término es
-%%% una variable. También se verifica si hay una diferencia
-%%% en los términos, Si ambas condiciones se cumplen
-%%% entonces el primer término (variable) toma el valor del
+%%% En esta clausula se verifica si el primer termino es
+%%% una variable. Tambien se verifica si hay una diferencia
+%%% en los terminos, Si ambas condiciones se cumplen
+%%% entonces el primer termino (variable) toma el valor del
 %%% segundo
 unify(T1, T2) :-
     var(T1),
@@ -30,10 +30,10 @@ unify(T1, T2) :-
     !.
 
 
-%%% En esta cláusula se verifica si el segundo término es
-%%% una variable. También se verifica si hay una diferencia
-%%% en los términos, Si ambas condiciones se cumplen
-%%% entonces el primer término (variable) toma el valor del
+%%% En esta clausula se verifica si el segundo termino es
+%%% una variable. Tambien se verifica si hay una diferencia
+%%% en los terminos, Si ambas condiciones se cumplen
+%%% entonces el primer termino (variable) toma el valor del
 %%% segundo
 unify(T1, T2) :-
     var(T2),
@@ -41,10 +41,10 @@ unify(T1, T2) :-
     T2 = T1,
     !.
 
-%%% Caso 3: ambos términos son compuestos.
-%%% En esta cláusula se verifica que ambos términos sean
-%%% compuestos. Se obtiene el número de argumentos y
-%%% se utiliza este número para unificar los argumentos.
+%%% Caso 3: ambos terminos son compuestos.
+%%% En esta clausula se verifica que ambos terminos sean
+%%% compuestos. Se obtiene el numero de argumentos y
+%%% se utiliza este numero para unificar los argumentos.
 unify(T1, T2) :-
     compound(T1),
     compound(T2),
@@ -52,15 +52,15 @@ unify(T1, T2) :-
     functor(T2, Functor, Numargs),
     sub_unify(T1, T2, Numargs).
 
-%%% Las siguientes dos cláusulas se encargan de unificar
+%%% Las siguientes dos clausulas se encargan de unificar
 %%% los argumentos de los funtores.
-%%% En el caso base cuando el número de argumentos es 0,
+%%% En el caso base cuando el numero de argumentos es 0,
 %%% tenemos lo siguiente:
 sub_unify(_, _, 0) :- !.
 
-%%% En cualquier otro caso, se obtienen los últimos argumentos
+%%% En cualquier otro caso, se obtienen los ultimos argumentos
 %%% del funtor y se unifican con 'unify'. Luego se hace una
-%%% llamada recursiva a 'sub_unify' con el número de argumentos
+%%% llamada recursiva a 'sub_unify' con el numero de argumentos
 %%% menos uno.
 sub_unify(T1, T2, Numargs) :-
     arg(Numargs, T1, Arg1),
