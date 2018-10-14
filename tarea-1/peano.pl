@@ -12,10 +12,23 @@ peanoToNatAux(P, N, Acc) :-
 
 sumaPeano(P1, P2, R) :-
     peanoToNat(P2, N),
-    sumNPeano(P1, N, R).
+    sumaNPeano(P1, N, R).
 
-sumNPeano(P, 0, P) :- !.
+sumaNPeano(P, 0, P) :- !.
 
-sumNPeano(P, N, R) :-
+sumaNPeano(P, N, R) :-
     Nnew is N - 1,
-    sumNPeano(s(P), Nnew, R).
+    sumaNPeano(s(P), Nnew, R).
+
+restaPeano(P1, P2, R) :-
+    peanoToNat(P2, N2),
+    peanoToNat(P1, N1),
+    N2 =< N1,
+    restaNPeano(P1, N2, R).
+
+restaNPeano(P, 0, P) :- !.
+
+restaNPeano(P, N, R) :-
+    Nnew is N - 1,
+    arg(1, P, Arg),
+    restaNPeano(Arg, Nnew, R).
