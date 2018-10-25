@@ -1,31 +1,27 @@
 
-:- dynamic
-    ubicacion/2.
-
 odia(perro, gato).
 odia(gato, hamster).
 
-ubicacion(perro, depa1).
-ubicacion(gato, depa1).
-ubicacion(hamster, depa1).
+s([[], _],_) :- !.
+s([Casa1, Casa2],[Casa1_Nueva, [X|Casa2]]) :-
+    member(X, Casa1),
+    mover(X, Casa1, Casa1_Nueva),
+    not(estado_invalido(Casa1_Nueva, [X|Casa2])).
 
-s([perro,gato,hamster], [])
+meta([[], [perro, gato, hamster]]).
 
-mover(X, [X|Tail], [Tail]).
+mover(X, [X|Tail], Tail).
 mover(X, [Y|Tail], [Y|NewTail]) :-
     mover(X, Tail, NewTail).
-meta([], [perro, gato, hamster]).
 
-estado_invalido(depa1, depa2) :-
-    ubicacion(X, depa1),
-    ubicacion(Y, depa1),
-    (odia(X,Y);
-    odia(Y,X)).
+estado_invalido(C1, C2) :-
+    (estado_invalido_aux(C1);
+    estado_invalido_aux(C2)).
 
-estado_invalido(depa1, depa2) :-
-    ubicacion(X, depa2),
-    ubicacion(Y, depa2),
-    (odia(X,Y);
-    odia(Y,X)).
+estado_invalido_aux([Top|Tail]) :-
+    (odia(Top, Other); odia(Other, Top)),
+    member(Other, Tail),
+    !.
+
 
 % mover([Top|Tail], R) :-
