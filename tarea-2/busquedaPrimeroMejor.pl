@@ -26,7 +26,7 @@ expandir(Camino, l(Nodo, _), _, _, si, [Nodo|Camino])  :-
 
 expandir(Camino, l(Nodo,F/G), Umbral, Arbol1, Resuelto, Sol)  :-
   F =< Umbral,
-  ( bagof( Nodo2/C, (s(Nodo,Nodo2,C), \+ member(Nodo2,Camino) ), Succ), 
+  ( bagof( Nodo2/C, (s(Nodo,Nodo2,C), \+ member(Nodo2,Camino) ), Succ),
     !,                                    % N tiene sucesores
     listaSucs(G, Succ, As),               % Construir subárboles As
     mejorF(As, F1),                       % f-valor del mejor sucesor
@@ -36,7 +36,7 @@ expandir(Camino, l(Nodo,F/G), Umbral, Arbol1, Resuelto, Sol)  :-
   ).
 
 %  Caso 3: no hoja, f-valor < Umbral
-%  Expandir el subárbol más promisorio; dependiendo de 
+%  Expandir el subárbol más promisorio; dependiendo de
 %  resultados, continuar decidirá como proceder.
 
 expandir(Camino, t(Nodo,F/G,[A|As]), Umbral, Arbol1, Resuelto, Sol)  :-
@@ -58,7 +58,7 @@ expandir( _, Arbol, Umbral, Arbol, no, _)  :-
 
 % continuar( Camino, Arbol, Umbral, NuevoArbol, SubarbolResuelto, ArbolResuelto, Sol)
 
-continuar( _, _, _, _, si, si, Sol).
+continuar( _, _, _, _, si, si, _Sol).
 
 continuar(Camino, t(Nodo,_/G,[A1|As]), Umbral, Arbol1, no, Resuelto, Sol)  :-
   insertar(A1, As, NAs),
@@ -100,8 +100,8 @@ f(t(_,F/_,_),F).      % f-valor de un árbol
 mejorF([A|_],F)  :-   % mejor F de una lista de árboles
   f(A,F).
 
-mejorF([],9999).       
-  
+mejorF([],9999).
+
 min(X,Y,X)  :-
   X =< Y, !.
 
@@ -113,4 +113,3 @@ reset :-
     retractall(s/3),
     retractall(h/2),
     retractall(meta/1).
-
