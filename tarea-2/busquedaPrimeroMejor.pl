@@ -2,14 +2,19 @@
 
 :- dynamic
        s/3,
-       h/2,
+       h/3,
        meta/1.
 
 % primeroMejor(Inicio, Sol): Sol es un camino de Inicio a la meta
-% Asumimos 9999 > que todo f-valor
+% Asumimos 99999 > que todo f-valor
 
-primeroMejor(Inicio, Sol) :-
-  expandir([], l(Inicio,0/0),  9999, _, si, Sol).
+primeroMejor(Inicio, Fin, Sol) :-
+    retractall(meta(_)),
+    assertz(meta(Fin)),
+    primeroMejorAux(Inicio, Sol).
+
+primeroMejorAux(Inicio, Sol) :-
+  expandir([], l(Inicio,0/0),  99999, _, si, Sol).
 
 % expandir(Camino, Arbol, Umbral, Arbol1, Resuelto, Sol):
 %   Camino entre Inicio y Arbol,
@@ -75,8 +80,9 @@ continuar(Camino, t(Nodo,_/G,[_|As]), Umbral, Arbol1, nunca, Resuelto, Sol)  :-
 listaSucs( _, [], []).
 
 listaSucs(G0, [N/C|NCs], As)  :-
+  meta(X),
   G is G0 + C,
-  h(N, H),                             % Heuristica h(N)
+  h(N, X, H),                             % Heuristica h(N)
   F is G + H,
   listaSucs(G0, NCs, As1),
   insertar(l(N,F/G), As1, As).
@@ -100,7 +106,7 @@ f(t(_,F/_,_),F).      % f-valor de un árbol
 mejorF([A|_],F)  :-   % mejor F de una lista de árboles
   f(A,F).
 
-mejorF([],9999).
+mejorF([],99999).
 
 min(X,Y,X)  :-
   X =< Y, !.
@@ -110,6 +116,6 @@ min(_,Y,Y).
 %%% Reset para llamar un nuevo problema
 
 reset :-
-    retractall(s/3),
-    retractall(h/2),
-    retractall(meta/1).
+    retractall(s(_,_,_)),
+    retractall(h(_,_,_)),
+    retractall(meta(_)).
