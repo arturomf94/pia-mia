@@ -1,15 +1,15 @@
 %%% sucesor incluye costos
 
-costo(tuxpan, poza_rica, 100).
-costo(poza_rica, xalapa, 100).
-costo(xalapa, veracruz, 100).
-costo(xalapa, cordoba, 100).
-costo(cordoba, orizaba, 100).
-costo(cordoba, veracruz, 100).
-costo(cordoba, minatitlan, 100).
-costo(veracruz, boca_del_rio, 100).
-costo(boca_del_rio, minatitlan, 100).
-costo(minatitlan, coatzacoalcos, 100).
+costo(tuxpan, poza_rica, 42).
+costo(poza_rica, xalapa, 0).
+costo(xalapa, veracruz, 114).
+costo(xalapa, cordoba, 301).
+costo(cordoba, orizaba, 30).
+costo(cordoba, veracruz, 206).
+costo(cordoba, minatitlan, 516).
+costo(veracruz, boca_del_rio, 0).
+costo(boca_del_rio, minatitlan, 510).
+costo(minatitlan, coatzacoalcos, 0).
 
 s(X, Y, C) :- costo(X,Y, C).
 s(X, Y, C) :- costo(Y,X, C).
