@@ -41,16 +41,17 @@ inducir(Ejs,Padre,_,_) :-
 % Caso 3. Se debe decidir que atributo es el mejor clasificador para
 % los ejemplos dados.
 
-inducir(Ejs,Padre,Atrs,Umbral) :- 
+inducir(Ejs,Padre,Atrs,Umbral) :-
     eligeAtr(Ejs,Atrs,Atr,Vals,Resto), !,
     particion(Vals,Atr,Ejs,Padre,Resto,Umbral).
 
 % Caso 4. Los datos son inconsistentes, no se pueden particionar.
 
-inducir(Ejs,Padre,_,_) :- !,
-    nodo(Padre,Test,_),
-    write('Datos inconsistentes: no es posible construir partición de '),
-    write(Ejs), write(' en el nodo '), writeln(Test). 
+inducir(_Ejs,_Padre,_,_).
+% inducir(Ejs,Padre,_,_) :- !,
+%     nodo(Padre,Test,_),
+%     write('Datos inconsistentes: no es posible construir partición de '),
+%     write(Ejs), write(' en el nodo '), writeln(Test).
 
 % eligeAtr(+Ejs,+Atrs,-Atr,-Vals,-Resto)
 % A partir de un conjunto de ejemplos Ejs y atributos Atrs, computa
@@ -60,7 +61,7 @@ inducir(Ejs,Padre,_,_) :- !,
 eligeAtr(Ejs,Atrs,Atr,Vals,RestoAtrs) :-
     length(Ejs,NumEjs),
     contenidoInformacion(Ejs,NumEjs,I), !,
-    findall((Atr-Vals)/Gain, 
+    findall((Atr-Vals)/Gain,
             (member(Atr,Atrs),
              vals(Ejs,Atr,[],Vals),
              separaEnSubConjs(Vals,Ejs,Atr,Parts),
@@ -117,7 +118,7 @@ subconj([_|Ejs],Atr,RestoEjs) :-
 particion([],_,_,_,_,_) :- !.
 particion([Val|Vals],Atr,Ejs,Padre,RestoAtrs,Umbral) :-
     subconj(Ejs,Atr=Val,SubEjs), !,
-    generaNodo(Nodo), 
+    generaNodo(Nodo),
     assertz(nodo(Nodo,Atr=Val,Padre)),
     inducir(SubEjs,Nodo,RestoAtrs,Umbral), !,
     particion(Vals,Atr,Ejs,Padre,RestoAtrs,Umbral).
@@ -133,11 +134,12 @@ distr(Ejs,DistClaseEjs) :-
     cuentaClases(Clases,Ejs,DistClaseEjs).
 
 cuentaClases([],_,[]) :- !.
-cuentaClases([Clase|Clases],Ejs,[Clase/NumEjsEnClase|RestoCuentas]) :-
+cuentaClases([Clase|Clases],Ejs,[Clase/Test|RestoCuentas]) :-
     % Extrae los ejemplos con clase Clase en la lista Cuentas
     findall(Ej,(member(Ej,Ejs),ejemplo(Ej,Clase,_)),EjsEnClase),
     % Computa cuantos ejemplos hay en la Clase
     length(EjsEnClase,NumEjsEnClase), !,
+    Test is NumEjsEnClase / NumEjsEnClase,
     % Cuentas para el resto de los valores de la clase
     cuentaClases(Clases,Ejs,RestoCuentas).
 
@@ -146,7 +148,7 @@ cuentaClases([Clase|Clases],Ejs,[Clase/NumEjsEnClase|RestoCuentas]) :-
 imprimeArbol :-
     imprimeArbol(raiz,0).
 
-imprimeArbol(Padre,_) :- 
+imprimeArbol(Padre,_) :-
     nodo(hoja,Clase,Padre), !,
     write(' => '),write(Clase).
 
@@ -267,5 +269,3 @@ butlast([],[]).
 butlast(L1,L2) :-
     last(L1,Last),
     append(L2,[Last],L1).
-
-
