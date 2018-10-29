@@ -47,11 +47,14 @@ inducir(Ejs,Padre,Atrs,Umbral) :-
 
 % Caso 4. Los datos son inconsistentes, no se pueden particionar.
 
-inducir(_Ejs,_Padre,_,_).
-% inducir(Ejs,Padre,_,_) :- !,
-%     nodo(Padre,Test,_),
-%     write('Datos inconsistentes: no es posible construir partición de '),
-%     write(Ejs), write(' en el nodo '), writeln(Test).
+% inducir(_Ejs,_Padre,_,_).
+inducir(Ejs,Padre,_,_) :- !,
+    nodo(Padre,_Test,_),
+    findall(Ej,(member(Ej,Ejs),ejemplo(Ej,si,_)),EjsEnClase),
+    length(EjsEnClase,NumEjsEnClase), !,
+    length(Ejs,NumEjs), !,
+    Prop is NumEjsEnClase / NumEjs,
+    assertz(nodo(hoja,[si/Prop],Padre)).
 
 % eligeAtr(+Ejs,+Atrs,-Atr,-Vals,-Resto)
 % A partir de un conjunto de ejemplos Ejs y atributos Atrs, computa
