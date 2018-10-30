@@ -47,6 +47,15 @@ inducir(Ejs,Padre,Atrs,Umbral) :-
 
 % Caso 4. Los datos son inconsistentes, no se pueden particionar.
 
+%%% La primera modificacion realizada fue
+%%% En la clausula inducir que trata el
+%%% caso 4, en el cual no era posible
+%%% procesar datos inconsistentes.
+%%% En lugar de mandar un error, la
+%%% clausula ahora cuenta las observaciones
+%%% con la clase 'si' y divide ese numero
+%%% entre el numero de ejemplos del conjunto.
+
 % inducir(_Ejs,_Padre,_,_).
 inducir(Ejs,Padre,_,_) :- !,
     nodo(Padre,_Test,_),
@@ -135,6 +144,12 @@ distr(Ejs,DistClaseEjs) :-
     setof(Clase,Ej^AVs^(member(Ej,Ejs),ejemplo(Ej,Clase,AVs)),Clases),
     % Cuenta la distribución de los valores para la Clase
     cuentaClases(Clases,Ejs,DistClaseEjs).
+
+%%% Se hizo una segunda modificacion para
+%%% expresar todas las clases como probabilidades
+%%% En este caso, queremos que si un conjunto
+%%% tiene solo ejemplos de una misma clase
+%%% entonces la probabilidad sea 1.
 
 cuentaClases([],_,[]) :- !.
 cuentaClases([Clase|Clases],Ejs,[Clase/Test|RestoCuentas]) :-

@@ -1,4 +1,8 @@
-%%% sucesor incluye costos
+
+%%% Las primeras clausulas incluyen
+%%% el costo de viaje de una ciudad
+%%% a otra, conformado por costo en
+%%% casetas y gasolina.
 
 costo(tuxpan, poza_rica, 146).
 costo(poza_rica, xalapa, 413).
@@ -11,8 +15,16 @@ costo(veracruz, boca_del_rio, 19).
 costo(boca_del_rio, minatitlan, 1048).
 costo(minatitlan, coatzacoalcos, 40).
 
+%%% La clausula s se define para
+%%% tener la relacion bidireccional
+%%% entre ciudades.
+
 s(X, Y, C) :- costo(X,Y, C).
 s(X, Y, C) :- costo(Y,X, C).
+
+%%% La clausula de distancia_aux
+%%% define la distancia entre ciudades
+%%% conectadas.
 
 distancia_aux(tuxpan, poza_rica, 56).
 distancia_aux(poza_rica, xalapa, 221).
@@ -25,8 +37,16 @@ distancia_aux(veracruz, boca_del_rio, 10).
 distancia_aux(boca_del_rio, minatitlan, 288).
 distancia_aux(minatitlan, coatzacoalcos, 21).
 
+%%% distancia generaliza distancia_aux
+%%% para que sea una relacion bidireccional.
+
 distancia(X, Y, D) :- distancia_aux(X, Y, D).
 distancia(X, Y, D) :- distancia_aux(Y, X, D).
+
+%%% La clausula h define la heuristica
+%%% utilizada en la busqueda.
+%%% h calcula la suma de distancias entre
+%%% cualquier par de ciudades.
 
 h(X, Y, D) :-
     h_aux(X, Y, [X], D), !.
