@@ -34,3 +34,18 @@
   (if (consp lst)
       (compress (car lst) 1 (cdr lst))
       lst))
+
+(defun mapcars (fn &rest lsts)
+  (let ((result nil))
+    (dolist (lst lsts)
+       (dolist (obj lst)
+          (push (funcall fn obj) result)))
+    (nreverse result)))
+
+(defun rmapcars (fn &rest args)
+  if (some #'atom args)
+     (apply fn args)
+     (apply #'mapcar
+            #'(lambda (&rest args)
+                (apply #'rmapcar fn args))
+            args))
