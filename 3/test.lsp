@@ -1,6 +1,9 @@
 (defun tercero (lst)
   (caddr lst))
 
+(defun suma (x y)
+  (+ x y))
+
 (defun suma-mayor-que (x y z)
   (> (+ x y) z))
 
