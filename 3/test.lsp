@@ -1,9 +1,6 @@
 (defun tercero (lst)
   (caddr lst))
 
-(defun suma (x y)
-  (+ x y))
-
 (defun suma-mayor-que (x y z)
   (> (+ x y) z))
 
@@ -44,11 +41,3 @@
        (dolist (obj lst)
           (push (funcall fn obj) result)))
     (nreverse result)))
-
-(defun rmapcars (fn &rest args)
-  if (some #'atom args)
-     (apply fn args)
-     (apply #'mapcar
-            #'(lambda (&rest args)
-                (apply #'rmapcar fn args))
-            args))
