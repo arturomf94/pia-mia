@@ -1,6 +1,6 @@
-(defun perms (list)
-  (cond ((null list) nil)
-        ((null (cdr list)) (list list))
-        (t (loop for atom in list
+(defun perms (lst)
+  (cond ((null lst) nil)
+        ((null (cdr lst)) (lst lst))
+        (t (loop for atom in lst
              append (mapcar (lambda (l) (cons atom l))
-                            (perms (remove atom list)))))))
+                            (perms (remove atom lst)))))))
