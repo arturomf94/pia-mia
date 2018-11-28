@@ -13,3 +13,9 @@
     ((null lst2) lst1)
     ((member (car lst1) lst2) (myunion (cdr lst1) lst2))
     (t (append (list(car lst1)) (myunion (cdr lst1) lst2)))))
+
+(defun dif (lst1 lst2)
+  (cond ((null lst1) '())
+    ((null lst2) lst1)
+    ((member (car lst1) lst2) (dif (cdr lst1) (remove (car lst1) lst2)))
+    (t (append (list(car lst1)) (dif (cdr lst1) lst2)))))
