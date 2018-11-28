@@ -19,7 +19,12 @@
     (t
      (list (root tree) (lbranch tree) (add_elt_tree elt (rbranch tree))))))
 
-(defun in_order_tree (tree)
-  (if (not (null (lbranch tree))) (in_order_tree (lbranch tree)))
+(defun in_order (tree)
+  (if (not (null (lbranch tree))) (in_order (lbranch tree)))
   (print (root tree))
-  (if (not (null (rbranch tree))) (in_order_tree (rbranch tree))))
+  (if (not (null (rbranch tree))) (in_order (rbranch tree))))
+
+(defun pre_order (tree)
+  (print (root tree))
+  (if (not (null (lbranch tree))) (pre_order (lbranch tree)))
+  (if (not (null (rbranch tree))) (pre_order (rbranch tree))))
