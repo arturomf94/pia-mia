@@ -28,3 +28,8 @@
   (print (root tree))
   (if (not (null (lbranch tree))) (pre_order (lbranch tree)))
   (if (not (null (rbranch tree))) (pre_order (rbranch tree))))
+
+(defun post_order (tree)
+  (if (not (null (lbranch tree))) (post_order (lbranch tree)))
+  (if (not (null (rbranch tree))) (post_order (rbranch tree)))
+  (print (root tree)))
