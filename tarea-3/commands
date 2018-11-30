@@ -1,0 +1,11 @@
+(load "~/.lispworks")
+
+(load "~/quicklisp/setup.lisp")
+
+(require "asdf")
+
+(push "~/quicklisp/load-projects/cl-id3/cl-id3/" asdf:*central-registry*)
+
+(asdf:operate 'asdf:load-op 'cl-id3)
+
+(ql:quickload "split-sequence")
