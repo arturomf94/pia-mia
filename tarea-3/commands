@@ -9,3 +9,7 @@
 (asdf:operate 'asdf:load-op 'cl-id3)
 
 (ql:quickload "split-sequence")
+
+(cl-id3:gui)
+
+
