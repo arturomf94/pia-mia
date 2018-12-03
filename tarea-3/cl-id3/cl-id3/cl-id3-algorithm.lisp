@@ -63,6 +63,12 @@
    ((equal a (car L)) (+ 1 (count-instance a (cdr L))))
    (t (count-instance a (cdr L)))))
 
+(defun count-instance-prop (a L)
+  (/ (count-instance a L) (list-length L)))
+
+(defun list-to-string (lst)
+  (format nil "~A~%" lst))
+
 ;;; id3
 
 (defun id3 (examples attribs)
@@ -74,7 +80,9 @@
       ;; Stop criteria
       ((same-class-value-p *target*
 			   class-by-default
-			   examples) (count-instance class-by-default vals))
+			   examples) (list-to-string
+                 (list class-by-default
+                       (count-instance-prop class-by-default vals))))
       ;; Failure
       ((null attribs) (target-most-common-value examples))
       ;; Recursive call
