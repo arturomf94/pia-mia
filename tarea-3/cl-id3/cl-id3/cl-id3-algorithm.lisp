@@ -7,7 +7,7 @@
 ;;;   Alejandro Guerra Hernandez
 ;;;   Departamento de Inteligencia Artificial
 ;;;   Universidad Veracruzana
-;;;   Facultad de Física e Inteligencia Artificial
+;;;   Facultad de Fï¿½sica e Inteligencia Artificial
 ;;;
 ;;;   12/01/2010 The system can generate cl-id3.app
 ;;;   06/01/2010 The system has a GUI
@@ -57,17 +57,24 @@
   "Is TREE a leaf ?"
   (atom tree))
 
+(defun count-instance (a L)
+  (cond
+   ((null L) 0)
+   ((equal a (car L)) (+ 1 (count-instance a (cdr L))))
+   (t (count-instance a (cdr L)))))
+
 ;;; id3
 
 (defun id3 (examples attribs)
   "It induces a decision tree running id3 over EXAMPLES and ATTRIBS)"
-  (let ((class-by-default (get-value *target* 
-				     (car examples))))
-    (cond 
+  (let ((class-by-default (get-value *target*
+				     (car examples)))
+        (vals (mapcar #'(lambda(x) (get-value *target* x)) examples)))
+    (cond
       ;; Stop criteria
-      ((same-class-value-p *target* 
-			   class-by-default 
-			   examples) class-by-default)
+      ((same-class-value-p *target*
+			   class-by-default
+			   examples) (count-instance class-by-default vals))
       ;; Failure
       ((null attribs) (target-most-common-value examples))
       ;; Recursive call
@@ -82,7 +89,7 @@
 (defun same-class-value-p (attrib value examples)
   "Do all EXAMPLES have the same VALUE for a given ATTRIB ?"
   (every #'(lambda(e)
-	     (eq value 
+	     (eq value
 		 (get-value attrib e)))
 	 examples))
 
@@ -120,11 +127,11 @@
 	(number-of-examples (length examples)))
     (apply #'+
 	   (mapcar #'(lambda(part)
-		       (let* ((size-part (count-if #'atom 
+		       (let* ((size-part (count-if #'atom
 						   (cdr part)))
-			      (proportion 
+			      (proportion
 			       (if (eq size-part 0) 0
-				   (/ size-part 
+				   (/ size-part
 				      number-of-examples))))
 			 (* -1.0 proportion (log proportion 2))))
 		   (cdr partition)))))
@@ -135,7 +142,7 @@
 	(no-examples (count-if #'atom examples)))
     (- (entropy examples *target*)
        (apply #'+
-	      (mapcar 
+	      (mapcar
 	       #'(lambda(part)
 		   (let* ((size-part (count-if #'atom
 					       (cdr part)))
@@ -147,14 +154,14 @@
 
 (defun best-partition (attributes examples)
   "It computes one of the best partitions induced by ATTRIBUTES over EXAMPLES"
-  (let* ((info-gains 
+  (let* ((info-gains
 	  (loop for attrib in attributes collect
 	       (let ((ig (information-gain examples attrib))
 		     (p (get-partition attrib examples)))
 		 (when *trace*
-		   (format t "Partición inducida por el atributo ~s:~%~s~%"
+		   (format t "Particiï¿½n inducida por el atributo ~s:~%~s~%"
 			   attrib p)
-		   (format t "Ganancia de información: ~s~%"
+		   (format t "Ganancia de informaciï¿½n: ~s~%"
 			   ig))
 		 (list ig p))))
 	 (best (cadar (sort info-gains #'(lambda(x y) (> (car x) (car y)))))))
