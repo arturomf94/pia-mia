@@ -57,15 +57,24 @@
   "Is TREE a leaf ?"
   (atom tree))
 
+;;; Se agrego la funcion count-instance
+;;; para contar todas las instancias de un
+;;; atomo en una lista.
 (defun count-instance (a L)
   (cond
    ((null L) 0)
    ((equal a (car L)) (+ 1 (count-instance a (cdr L))))
    (t (count-instance a (cdr L)))))
 
+;;; La funcion count-instance-prop expresa
+;;; el conteo de count-instance como proporcion
+;;; de la longitud de la lista.
 (defun count-instance-prop (a L)
   (/ (count-instance a L) (list-length L)))
 
+;;; La funcion list-to-string formatea
+;;; una lista para poder expresarla como
+;;; cadena.
 (defun list-to-string (lst)
   (format nil "~A~%" lst))
 
@@ -73,17 +82,26 @@
 
 (defun id3 (examples attribs)
   "It induces a decision tree running id3 over EXAMPLES and ATTRIBS)"
+  ;;; Se agrego la variable vals que crea la lista de todos los
+  ;;; valores de *target* en examples
   (let ((class-by-default (get-value *target*
 				     (car examples)))
         (vals (mapcar #'(lambda(x) (get-value *target* x)) examples)))
     (cond
       ;; Stop criteria
+      ;;; Se modifico este criterio para que regresara la clase en
+      ;;; cuestion y la propocion de clasificaciones de esa clase.
+      ;;; En este caso la proporcion siempre sera 1.
       ((same-class-value-p *target*
 			   class-by-default
 			   examples) (list-to-string
                  (list class-by-default
                        (count-instance-prop class-by-default vals))))
       ;; Failure
+      ;;; Tambien se modifico este criterio para que regresara
+      ;;; la clase en cuestion y la proporcion que representa esa
+      ;;; clase en ese nodo. En este caso esa proporcion siempre es
+      ;;; menor que 1.
       ((null attribs) (list-to-string
               (list class-by-default
                     (count-instance-prop class-by-default vals))))
