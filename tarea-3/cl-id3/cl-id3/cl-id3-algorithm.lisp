@@ -84,7 +84,9 @@
                  (list class-by-default
                        (count-instance-prop class-by-default vals))))
       ;; Failure
-      ((null attribs) (target-most-common-value examples))
+      ((null attribs) (list-to-string
+              (list class-by-default
+                    (count-instance-prop class-by-default vals))))
       ;; Recursive call
       (t (let* ((partition (best-partition attribs examples))
 		(node (first partition)))
