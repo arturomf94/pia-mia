@@ -7,7 +7,7 @@
 ;;;   Alejandro Guerra Hernandez
 ;;;   Departamento de Inteligencia Artificial
 ;;;   Universidad Veracruzana
-;;;   Facultad de Fï¿½sica e Inteligencia Artificial
+;;;   Facultad de Física e Inteligencia Artificial
 ;;;
 ;;;   12/01/2010 The system can generate cl-id3.app
 ;;;   06/01/2010 The system has a GUI
@@ -57,54 +57,19 @@
   "Is TREE a leaf ?"
   (atom tree))
 
-;;; Se agrego la funcion count-instance
-;;; para contar todas las instancias de un
-;;; atomo en una lista.
-(defun count-instance (a L)
-  (cond
-   ((null L) 0)
-   ((equal a (car L)) (+ 1 (count-instance a (cdr L))))
-   (t (count-instance a (cdr L)))))
-
-;;; La funcion count-instance-prop expresa
-;;; el conteo de count-instance como proporcion
-;;; de la longitud de la lista.
-(defun count-instance-prop (a L)
-  (/ (count-instance a L) (list-length L)))
-
-;;; La funcion list-to-string formatea
-;;; una lista para poder expresarla como
-;;; cadena.
-(defun list-to-string (lst)
-  (format nil "~A~%" lst))
-
 ;;; id3
 
 (defun id3 (examples attribs)
   "It induces a decision tree running id3 over EXAMPLES and ATTRIBS)"
-  ;;; Se agrego la variable vals que crea la lista de todos los
-  ;;; valores de *target* en examples
-  (let ((class-by-default (get-value *target*
-				     (car examples)))
-        (vals (mapcar #'(lambda(x) (get-value *target* x)) examples)))
-    (cond
+  (let ((class-by-default (get-value *target* 
+				     (car examples))))
+    (cond 
       ;; Stop criteria
-      ;;; Se modifico este criterio para que regresara la clase en
-      ;;; cuestion y la propocion de clasificaciones de esa clase.
-      ;;; En este caso la proporcion siempre sera 1.
-      ((same-class-value-p *target*
-			   class-by-default
-			   examples) (list-to-string
-                 (list class-by-default
-                       (count-instance-prop class-by-default vals))))
+      ((same-class-value-p *target* 
+			   class-by-default 
+			   examples) class-by-default)
       ;; Failure
-      ;;; Tambien se modifico este criterio para que regresara
-      ;;; la clase en cuestion y la proporcion que representa esa
-      ;;; clase en ese nodo. En este caso esa proporcion siempre es
-      ;;; menor que 1.
-      ((null attribs) (list-to-string
-              (list class-by-default
-                    (count-instance-prop class-by-default vals))))
+      ((null attribs) (target-most-common-value examples))
       ;; Recursive call
       (t (let* ((partition (best-partition attribs examples))
 		(node (first partition)))
@@ -117,7 +82,7 @@
 (defun same-class-value-p (attrib value examples)
   "Do all EXAMPLES have the same VALUE for a given ATTRIB ?"
   (every #'(lambda(e)
-	     (eq value
+	     (eq value 
 		 (get-value attrib e)))
 	 examples))
 
@@ -155,11 +120,11 @@
 	(number-of-examples (length examples)))
     (apply #'+
 	   (mapcar #'(lambda(part)
-		       (let* ((size-part (count-if #'atom
+		       (let* ((size-part (count-if #'atom 
 						   (cdr part)))
-			      (proportion
+			      (proportion 
 			       (if (eq size-part 0) 0
-				   (/ size-part
+				   (/ size-part 
 				      number-of-examples))))
 			 (* -1.0 proportion (log proportion 2))))
 		   (cdr partition)))))
@@ -170,7 +135,7 @@
 	(no-examples (count-if #'atom examples)))
     (- (entropy examples *target*)
        (apply #'+
-	      (mapcar
+	      (mapcar 
 	       #'(lambda(part)
 		   (let* ((size-part (count-if #'atom
 					       (cdr part)))
@@ -182,14 +147,14 @@
 
 (defun best-partition (attributes examples)
   "It computes one of the best partitions induced by ATTRIBUTES over EXAMPLES"
-  (let* ((info-gains
+  (let* ((info-gains 
 	  (loop for attrib in attributes collect
 	       (let ((ig (information-gain examples attrib))
 		     (p (get-partition attrib examples)))
 		 (when *trace*
-		   (format t "Particiï¿½n inducida por el atributo ~s:~%~s~%"
+		   (format t "Partición inducida por el atributo ~s:~%~s~%"
 			   attrib p)
-		   (format t "Ganancia de informaciï¿½n: ~s~%"
+		   (format t "Ganancia de información: ~s~%"
 			   ig))
 		 (list ig p))))
 	 (best (cadar (sort info-gains #'(lambda(x y) (> (car x) (car y)))))))
