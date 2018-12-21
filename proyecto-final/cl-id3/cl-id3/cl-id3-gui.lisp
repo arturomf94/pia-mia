@@ -199,6 +199,203 @@
        :title "CL-ID3:attributes"))
     (display (make-instance 'gui-domains))))
 
+;;
+(defun gui-classify (data interface)
+  (declare (ignore data interface))
+  (define-interface new-classify-int () ()
+    (:panes
+     (new-ex-pane text-input-pane
+                  :title "Nuevo ejemplo: "
+                  :accessor new-ex-pane
+                  :text ""
+                  :enabled t)
+     (most-voted-class text-input-pane
+                       :title "Clase más votada: "
+                       :accessor most-voted-class
+                       :text ""
+                       :enabled NIL)
+     (bttn-classify push-button
+                   :text "Clasificar"
+                   :callback 'classify-new-instance2)
+     (bttn-quit push-button
+                    :text "Cerarr"
+                    :callback 'gui-quit))
+    (:default-initargs
+       :title "CL-ID3: Classify"))
+    (display (make-instance 'new-classify-int)))
+
+;;;Mejora David Martínez Galicia
+
+(defun prune-utility (data interface) 
+  (declare (ignore data interface))
+;;Re-incorporación de la ventana de ejemplos
+  (let* ((max-length-attrib 
+          (apply #'max 
+                 (mapcar #'length
+                         (mapcar #'princ-to-string
+                                 *attributes*))))
+	 (column-width (list 'character
+                             (+ 1 max-length-attrib)))
+	 (pane-total-width (list 'character
+                                 (* max-length-attrib 
+                                    (+ 1 (length *attributes*))))))
+    (define-interface prune-int () ()
+      (:panes 
+       (examples-pane multi-column-list-panel
+                      :columns (loop for a in *attributes* collect 
+                                     (list :title (princ-to-string a)
+                                           :adjust :center
+                                           :visible-min-width column-width))
+                      :items (loop for d in *data* collect 
+                                   (mapcar #'princ-to-string d))
+                      :visible-min-width pane-total-width
+                      :visible-min-height :text-height
+                      :vertical-scroll t)
+;;Nuevos elementos de la ventana
+       (texto editor-pane
+              :title "Consideraciones: "
+              :text "Utilidad agregada por David Martínez Galicia. Apoyo para la poda post-mortem de arboles basada en la prueba chi cuadrada. Sólo es necesario escribir el nombre atributo y el número de los ejemplos que serán usados, ej '1 2 3 4 8 9'."
+              :enabled nil)
+       (attr-pane text-input-pane
+                  :title "Atributo: "
+                  :accessor attr-pane
+                  :text ""
+                  :enabled t)
+       (ex-pane text-input-pane
+                :title "Ejemplos: "
+                :accessor ex-pane
+                :text ""
+                :enabled t)
+       (dom-pane text-input-pane
+                 :title "Dominio del atributo: "
+                 :accessor dom-pane
+                 :text ""
+                 :enabled nil)
+       (df-pane text-input-pane
+                :title "Grado de libertad: "
+                :accessor df-pane
+                :text ""
+                :enabled nil)
+       (vcr-pane text-input-pane
+                 :title "Valor crítico: "
+                 :accessor vcr-pane
+                 :text "0"
+                 :enabled nil)
+       (vcalc-pane text-input-pane
+                   :title "Valor calculado: "
+                   :accessor vcalc-pane
+                   :text "0"
+                   :enabled nil)
+       (hip-pane text-input-pane
+                 :title "Hipotesis: "
+                 :accessor hip-pane
+                 :text ""
+                 :enabled nil)
+       (bttn-prune push-button
+                   :text "Correr prueba"
+                   :callback 'gui-prune)
+       (button-pane push-button
+                    :text "Close"
+                    :callback 'gui-quit))
+      (:default-initargs
+       :title "CL-ID3:Prune Utility"))
+    (display (make-instance 'prune-int))))
+;;Función que se lleva a cabo con el botón "correr prueba"
+(defun gui-prune (data interface)
+  (declare (ignore data))
+  (progn
+;;Definición de variables
+    (setq *vcri* '(6.635 9.210 11.345))
+    (setq critico 0)
+    (setq calculado 0)
+;;Determinación del indice de atributos
+    (cond ((equal "cielo" (text-input-pane-text (attr-pane interface)))  
+           (setq option 0))
+          ((equal "temperatura" (text-input-pane-text (attr-pane interface))) 
+           (setq option 1))
+          ((equal "humedad" (text-input-pane-text (attr-pane interface))) 
+           (setq option 2))
+          ((equal "viento" (text-input-pane-text (attr-pane interface))) 
+           (setq option 3))
+          (t (setq option 5))
+          )
+;;Dom-list almacena el dominio del atributo seleccionado y luego se muestra en un panel de texto
+    (setq dom-list (nth option *domains*))
+    (setf (text-input-pane-text (dom-pane interface)) 
+          (princ-to-string dom-list))
+;;Clases almacena los valores de clase
+    (setq clases (nth 4 *domains*))
+;;Una vez obtenidos valores anteriores se procede a realizar el calculo de variables. 
+    (when dom-list
+      (progn
+;; El grado de libertad se calcula restando un elemento al dominio del atributo
+        (setf (text-input-pane-text (df-pane interface)) 
+              (princ-to-string (- (length dom-list) 1)))
+;;El valor crítico se obitne de una lista.
+        (setq critico 
+              (nth (-(length dom-list) 2) *vcri*))
+        (setf (text-input-pane-text (vcr-pane interface)) 
+              (princ-to-string critico))
+;;Del panel ex-list se obtiene los números de ejemplos a utilizar.
+        (setq ex-list (with-input-from-string 
+                          (s (text-input-pane-text (ex-pane interface)))
+                        (loop for x = (read s nil :end) until (eq x :end) 
+                              collect x)))
+;;Los ejemplos seleccionados son guardados en la variable datos.
+        (setf datos (loop for example in ex-list 
+                          collect (nth example *data*)))
+;;A partir de este momento se definen variables para genarar el valor esperado de cuardo al dominio del atributo y su clasificación
+        (setq total (length datos))
+        (setq totalsi 
+              (length (loop for ej in datos 
+                            when (equal (nth 4 ej) (car clases)) 
+                            collect (nth 4 ej))))
+        (setq totalno 
+              (length (loop for ej in datos 
+                            when (equal (nth 4 ej) (cadr clases)) 
+                            collect (nth 4 ej))))
+        (setq totaldom (loop for dom in dom-list 
+                            collect (length (loop for ej in datos 
+                                                  when (equal (nth option ej) dom)
+                                                              collect (nth option ej)))))
+        (setq vesi (loop for vdom in totaldom 
+                         collect (/ (* vdom totalsi) total)))
+        (setq veno (loop for vdom in totaldom
+                         collect (/ (* vdom totalno) total)))
+        (setq vetotal (append vesi veno))
+        (setq vosi (loop for dom in dom-list
+                         collect (length (loop for ej in datos
+                                               when (and (equal (nth option ej) dom) 
+                                                         (equal (nth 4 ej) (car clases)))
+                                               collect (nth option ej)))))
+        (setq vono (loop for dom in dom-list 
+                         collect (length (loop for ej in datos
+                                               when (and (equal (nth option ej) dom) 
+                                                        (equal (nth 4 ej) (cadr clases)))
+                                               collect (nth option ej)))))
+        (setq vototal (append vosi vono))
+;;Se utiliza la fórmula de la prueba chi cuadrada y se muestra en el cuadro de texto vcalc-pane, para finalmente decidir si se acepta o rechaza la hipótesis.
+        (when (equal (length vetotal) (length vototal))
+          (progn
+            (setq list_sum (loop for x from 0 to (- (length vetotal) 1) 
+                                 collect (/ (expt (- (nth x vototal) (nth x vetotal)) 2)
+                                            (nth x vetotal))))
+            (setq calculado (apply '+ list_sum))
+            (setf (text-input-pane-text (vcalc-pane interface)) 
+                  (princ-to-string calculado))
+            (cond ((> critico calculado) 
+                   (setf (text-input-pane-text (hip-pane interface)) "Rechazada"))
+                  (t 
+                   (setf (text-input-pane-text (hip-pane interface)) "Aceptada")))
+            ))
+
+
+        ))
+    
+    
+    )
+)
+
 
 ;;; view/examples
 

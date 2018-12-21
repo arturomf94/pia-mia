@@ -3,16 +3,34 @@
 ;;; cl-id3-cross-validation
 
 (defun cross-validation (k)
-  (let* ((long (length *examples*)))
+  (let* ((long (length *examples*)) (*k-validation-trees* '()))
+    (progn
+      (setf *classify-on* t)
     (loop repeat k do
 	 (let* ((trainning-data (folding (- long k) long))
 		(test-data (difference trainning-data *examples*))
 		(tree (induce trainning-data)))
            ;; Agrega elementos a las variables para su cálculo
 	   (progn 
+             (setf *k-validation-trees* (append *k-validation-trees* (list tree))) 
              (report tree test-data)
-             (print *classified-int*)
-             (print *c-classified-int*))))))
+             ;(print *classified-int*)
+             (print *c-classified-int*))))
+    (setf *best-tree* (nth (select-bt *c-classified-int*) *k-validation-trees*))
+    (print *best-tree*))))
+
+;;; Best tree
+
+(defun select-bt (lst)
+  (let ((cont 0) (index 0) (acc 0))
+    (progn 
+      (loop for x in lst
+            do (progn
+                 (when (> x acc) (and (setf acc x) (setf index cont)))
+                 (setf cont (+ cont 1))))
+      index)))
+
+;;;
 
 (defun report (tree data)
   (let ((positives (count-positives tree data)))

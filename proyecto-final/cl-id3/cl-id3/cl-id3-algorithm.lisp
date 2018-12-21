@@ -38,6 +38,8 @@
 (defvar *target* nil "The target concept")
 (defvar *trace* nil "Trace the computations")
 (defvar *current-tree* "The tree being processed")
+(defvar *k-validation-trees* '() "List of generated trees")
+(defvar *best-tree* '() "The best")
 
 ;;; functions on decision trees
 
