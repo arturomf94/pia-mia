@@ -32,9 +32,17 @@
                :accessor class-pane
                :text ""
                :enabled nil)
-   (efficiency-pane text-input-pane
+   (accuracy-pane text-input-pane
                     :text ""
                     :accessor e-pane
+                    :enabled nil)
+   (voting-accuracy-pane text-input-pane
+                    :text ""
+                    :accessor e1-pane
+                    :enabled nil)
+   (best-tree-accuracy-pane text-input-pane
+                    :text ""
+                    :accessor e2-pane
                     :enabled nil)
    (k-value-pane text-input-pane
                  :accessor k-pane
@@ -102,7 +110,9 @@
                  :title "Trainning Set"
                  :title-position :frame :columns '2)
    (id3-pane grid-layout '("K value" k-value-pane
-			   "Efficiency" efficiency-pane)
+			   "Average Accuracy" accuracy-pane
+         "Voting Accuracy" voting-accuracy-pane
+         "Best-Tree Accuracy" best-tree-accuracy-pane)
              :y-adjust :center
              :title "Cross Validation"
              :title-position :frame :columns '2))
