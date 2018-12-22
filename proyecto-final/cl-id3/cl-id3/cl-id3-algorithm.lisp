@@ -7,7 +7,7 @@
 ;;;   Alejandro Guerra Hernandez
 ;;;   Departamento de Inteligencia Artificial
 ;;;   Universidad Veracruzana
-;;;   Facultad de Física e Inteligencia Artificial
+;;;   Facultad de Fï¿½sica e Inteligencia Artificial
 ;;;
 ;;;   12/01/2010 The system can generate cl-id3.app
 ;;;   06/01/2010 The system has a GUI
@@ -38,8 +38,8 @@
 (defvar *target* nil "The target concept")
 (defvar *trace* nil "Trace the computations")
 (defvar *current-tree* "The tree being processed")
-(defvar *k-validation-trees* '() "List of generated trees")
-(defvar *best-tree* '() "The best")
+(defvar *k-validation-trees* '() "List that contains all the trees from k-validation") ;;Agregada por DHE
+(defvar *best-tree* '() "List that contains the best tree from k-validation") ;;Agregada por DHE
 
 ;;; functions on decision trees
 
@@ -154,9 +154,9 @@
 	       (let ((ig (information-gain examples attrib))
 		     (p (get-partition attrib examples)))
 		 (when *trace*
-		   (format t "Partición inducida por el atributo ~s:~%~s~%"
+		   (format t "Particiï¿½n inducida por el atributo ~s:~%~s~%"
 			   attrib p)
-		   (format t "Ganancia de información: ~s~%"
+		   (format t "Ganancia de informaciï¿½n: ~s~%"
 			   ig))
 		 (list ig p))))
 	 (best (cadar (sort info-gains #'(lambda(x y) (> (car x) (car y)))))))

@@ -3,41 +3,30 @@
 ;;; cl-id3-cross-validation
 
 (defun cross-validation (k)
-  (let* ((long (length *examples*)) (*k-validation-trees* '()))
-    (progn
-      (setf *classify-on* t)
+  (let* ((long (length *examples*))(k-validation-trees '()))
     (loop repeat k do
 	 (let* ((trainning-data (folding (- long k) long))
 		(test-data (difference trainning-data *examples*))
 		(tree (induce trainning-data)))
-           ;; Agrega elementos a las variables para su cálculo
+    (setf *k-validation-trees* (append *k-validation-trees* (list tree))) ;;Agregado por mi
+           ;; Agrega elementos a las variables para su cï¿½lculo
 	   (progn 
-             (setf *k-validation-trees* (append *k-validation-trees* (list tree))) 
              (report tree test-data)
-             ;(print *classified-int*)
-             (print *c-classified-int*))))
-    (setf *best-tree* (nth (select-bt *c-classified-int*) *k-validation-trees*))
-    (print *best-tree*))))
-
-;;; Best tree
-
-(defun select-bt (lst)
-  (let ((cont 0) (index 0) (acc 0))
-    (progn 
-      (loop for x in lst
-            do (progn
-                 (when (> x acc) (and (setf acc x) (setf index cont)))
-                 (setf cont (+ cont 1))))
-      index)))
-
-;;;
+             (print "Classified-int") ;;Agregada por mi
+             (print *classified-int*)
+             (print "c-classified-int") ;;Agregada por mi
+             (print *c-classified-int*)
+             )))
+             (setf *best-tree* (nth (maximum-idx *c-classified-int*) *k-validation-trees*))
+             (print *best-tree*)
+             ))
 
 (defun report (tree data)
   (let ((positives (count-positives tree data)))
     (progn
       (print-tree tree)
       (print (format t 
-                     "~%Instances classified correctly: ~S~%Instances classified incorrectly: ~S~%~%"
+                     "~%Instances Classified Correctly: ~S~%Instances Classified Incorrectly: ~S~%~%"
                      positives 
                      (- (length data) positives)))
       (setf *classified-int* (append *classified-int* (list (length data)) ))
@@ -63,3 +52,30 @@
   (loop for i in list1 collect
        (setf list2 (remove i list2)))
   list2)
+
+;;; Agregado por DHE
+
+;;; Funcion para obtener los elementos mas repetidos de una lista
+(defun repetidos (lst &optional (resultado '()))
+ "Funcion que obtiene los elementos que mas se repiten en la lista lst, almacenandolos en la lista resultado"
+ (if (null lst)
+   (reverse resultado)
+   (if (member (first lst) (rest lst))
+     (repetidos (rest lst) (adjoin (first lst) resultado))
+     (repetidos (rest lst) resultado))))
+
+;;; maximum-idx es la Funcion para obtener el maximo elemento de una lista 
+;;; y su indice (iota y maximum son complementos de maximum-idx) 
+(defun maximum-idx (lst)
+  (cadr (multiple-value-list (maximum lst))))
+(defun maximum (lst)
+  (let ((max-idx 0)
+        (max-val (car lst)))
+  (mapcar #'(lambda (x y) (if (> x max-val)
+                            (progn
+                              (setf max-val x)
+                              (setf max-idx y))))
+          lst (iota (length lst)))
+  (values max-val max-idx)))
+(defun iota (n &optional (start-at 0))
+  (if (<= n 0) nil (cons start-at (iota (- n 1) (+ start-at 1)))))
