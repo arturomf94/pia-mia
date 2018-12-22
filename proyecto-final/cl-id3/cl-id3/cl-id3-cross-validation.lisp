@@ -10,7 +10,7 @@
 		(tree (induce trainning-data)))
     (setf *k-validation-trees* (append *k-validation-trees* (list tree))) ;;Agregado por mi
            ;; Agrega elementos a las variables para su c�lculo
-	   (progn 
+	   (progn
              (report tree test-data)
              (print "Classified-int") ;;Agregada por mi
              (print *classified-int*)
@@ -25,23 +25,33 @@
   (let ((positives (count-positives tree data)))
     (progn
       (print-tree tree)
-      (print (format t 
+      (print (format t
                      "~%Instances Classified Correctly: ~S~%Instances Classified Incorrectly: ~S~%~%"
-                     positives 
+                     positives
                      (- (length data) positives)))
       (setf *classified-int* (append *classified-int* (list (length data)) ))
       (setf *c-classified-int* (append *c-classified-int* (list positives))) )))
 
+(defun calculate-voting-accuracy (trees)
+  (/ (count-voting-positives trees *examples*) (length *examples*)))
+
 (defun count-positives (tree data)
   (apply #'+
-	 (mapcar #'(lambda (e) 
+	 (mapcar #'(lambda (e)
 		     (if (eql (classify e tree)
 			      (get-value *target* e))
 			 1 0)) data)))
 
+ (defun count-voting-positives (tree data)
+  (apply #'+
+ 	 (mapcar #'(lambda (e)
+ 		     (if (eql (classify-new-instance-votacion e tree)
+ 			      (get-value *target* e))
+ 			 1 0)) data)))
+
 (defun folding (n size)
   (let ((buffer nil))
-    (loop repeat n 
+    (loop repeat n
        collect (nth (let ((r (random size)))
 		      (progn
 			(while (member r buffer) (setf r (random size)))
@@ -64,8 +74,8 @@
      (repetidos (rest lst) (adjoin (first lst) resultado))
      (repetidos (rest lst) resultado))))
 
-;;; maximum-idx es la Funcion para obtener el maximo elemento de una lista 
-;;; y su indice (iota y maximum son complementos de maximum-idx) 
+;;; maximum-idx es la Funcion para obtener el maximo elemento de una lista
+;;; y su indice (iota y maximum son complementos de maximum-idx)
 (defun maximum-idx (lst)
   (cadr (multiple-value-list (maximum lst))))
 (defun maximum (lst)

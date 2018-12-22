@@ -35,9 +35,9 @@
 ;;;   (cl-id3::classify-new-instance-votacion '(COMMON-LISP-USER::nublado COMMON-LISP-USER::calor COMMON-LISP-USER::normal COMMON-LISP-USER::debil) cl-id3::*k-validation-trees*)
 
 (defun classify-new-instance-votacion (ninstance arboles)
-  (repetidos
+  (car (repetidos
     (loop for x in arboles
-      collect (classify-new-instance ninstance x)
+      collect (classify ninstance x)
     )
-  )
+  ))
 )
