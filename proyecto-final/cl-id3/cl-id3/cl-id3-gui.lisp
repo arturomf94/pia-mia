@@ -138,7 +138,9 @@
           (princ-to-string (/ (apply #'+ *c-classified-int*)
                               (apply #'+ *classified-int*))))
     (setf (text-input-pane-text (e1-pane interface))
-          (princ-to-string (calculate-voting-accuracy *k-validation-trees*)))))
+          (princ-to-string (calculate-voting-accuracy *k-validation-trees*)))
+    (setf (text-input-pane-text (e2-pane interface))
+          (princ-to-string (calculate-best-tree-accuracy *best-tree*)))))
 
 ;;; file/load
 

@@ -35,6 +35,9 @@
 (defun calculate-voting-accuracy (trees)
   (/ (count-voting-positives trees *examples*) (length *examples*)))
 
+(defun calculate-best-tree-accuracy (best-tree)
+  (/ (count-positives best-tree *examples*) (length *examples*)))
+
 (defun count-positives (tree data)
   (apply #'+
 	 (mapcar #'(lambda (e)
