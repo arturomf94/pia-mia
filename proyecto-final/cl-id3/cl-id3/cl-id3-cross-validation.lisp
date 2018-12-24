@@ -30,13 +30,26 @@
 
 (defun tree2string (tree)
   (setq counter 0)
-  (tree2string-aux tree ""))
+  (setq str "")
+  (tree2string-aux tree)
+  (write str))
 
-(defun tree2string-aux (tree str)
+(defun tree2string-aux (tree)
   (setq tree-variable (string-downcase (string (car tree))))
+  (setq counter_aux counter)
   (cond
-    ((or (atom (car (cdr tree))) (atom (car (cdr tree))))
-      (concatenate 'string str "(hoja,[" (string-downcase (string (car (cdr tree)))) "/1]," (write-to-string counter) ")"))))
+    ((atom (car (cdr tree)))
+      (setq str (concatenate 'string str "hoja,[" (string-downcase (string (car (cdr tree)))) "/1]," (write-to-string counter) "~%")))
+    (t (loop for i in (cdr tree)
+          DO (setq counter (+ counter 1))
+            (setq str (concatenate 'string str (write-to-string counter) "," tree-variable "=" (string-downcase (string (car i))) "," (write-to-string counter_aux) "~%"))
+            (tree2string-aux i)))))
+
+
+(defun test-loop (lst)
+  (loop for i in lst
+      DO (print i)
+      (print lst)))
 
 (defun report (tree data)
   (let ((positives (count-positives tree data)))
