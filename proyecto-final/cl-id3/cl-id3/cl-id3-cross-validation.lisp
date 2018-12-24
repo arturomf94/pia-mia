@@ -21,6 +21,13 @@
              (print *best-tree*)
              ))
 
+(defun write-tree (tree)
+  (with-open-file (stream "~/quicklisp/local-projects/cl-id3/cl-id3/filename.csv"
+                       :direction :output
+                       :if-exists :supersede
+                       :if-does-not-exist :create)
+    (format stream tree)))
+
 (defun report (tree data)
   (let ((positives (count-positives tree data)))
     (progn

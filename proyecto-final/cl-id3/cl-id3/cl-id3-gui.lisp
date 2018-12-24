@@ -133,6 +133,8 @@
     (setf *classified-int* '() *c-classified-int* '())
     ;; Lanza la funci�n con K
     (cross-validation (parse-integer k))
+    ;; Escribe el mejor arbol en un .txt
+    (write-tree (princ-to-string *best-tree*))
     ;; Calcula y define la eficiencia
     (setf (text-input-pane-text (e-pane interface))
           (princ-to-string (/ (apply #'+ *c-classified-int*)
