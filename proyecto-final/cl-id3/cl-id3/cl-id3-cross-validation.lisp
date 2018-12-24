@@ -20,31 +20,67 @@
              (setf *best-tree* (nth (maximum-idx *c-classified-int*) *k-validation-trees*))
              (print *best-tree*)
              ))
+(defun traducir2 (arbol padre etiqueta)
 
-(defun write-tree (tree)
-  (with-open-file (stream "~/quicklisp/local-projects/cl-id3/cl-id3/filename.csv"
-                       :direction :output
-                       :if-exists :supersede
-                       :if-does-not-exist :create)
-    (format stream tree)))
+	(let ((*print-case* :downcase))
+	(progn
+	(if (listp arbol)
+		(loop for i in (cdr (crear-nodos arbol)) do
+			(progn
+			(if (eq padre 0)
+				(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+					:direction :output
+					:if-exists :append
+					:if-does-not-exist :create)
+					(format str "nodo(~A,~A=~A,raiz).~%" (setf etiqueta (+ etiqueta 1)) (car (crear-nodos arbol)) i))
+				(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+					:direction :output
+					:if-exists :append
+					:if-does-not-exist :create)
+					(format str "nodo(~A,~A=~A,~A).~%" (setf etiqueta (+ etiqueta 1)) (car (crear-nodos arbol)) i padre))
+			)
+			(loop for j in (cdr arbol) do
+				(if (equal i (car j))
+					(progn
+					(if (> (length j) 1) (traducir2 (cadr j) etiqueta etiqueta) (traducir2 (car j) etiqueta etiqueta))
+					(setf etiqueta (+ etiqueta 1))
+					)
+				)
+			)
+			)
+		)
+		(progn
+		(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+					:direction :output
+					:if-exists :append
+					:if-does-not-exist :create)
+		(format str "nodo(hoja,[~A/_],~A). ~%" arbol etiqueta))
+		)
+	)
+	)
+	)
+)
 
-(defun tree2string (tree)
-  (setq counter 0)
-  (setq str "")
-  (tree2string-aux tree)
-  (write str))
+(defun crear-nodos (lista)
+	(loop for i in lista collect
+		(if (listp i) (car i) i)
+	)
+)
 
-(defun tree2string-aux (tree)
-  (setq tree-variable (string-downcase (string (car tree))))
-  (setq counter_aux counter)
-  (cond
-    ((atom (car (cdr tree)))
-      (setq str (concatenate 'string str "hoja,[" (string-downcase (string (car (cdr tree)))) "/1]," (write-to-string counter) "~%")))
-    (t (loop for i in (cdr tree)
-          DO (setq counter (+ counter 1))
-            (setq str (concatenate 'string str (write-to-string counter) "," tree-variable "=" (string-downcase (string (car i))) "," (write-to-string counter_aux) "~%"))
-            (tree2string-aux i)))))
+(defun traducir (arbol)
 
+	(progn
+	(traducir2 arbol 0 0)
+	(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+					:direction :output
+					:if-exists :append
+					:if-does-not-exist :create)
+	(format str "~%~%%Ejemplo:[cielo=soleado,temperatura=alta,humedad=alta,viento=debil].~%
+jugarTenis(Ejemplo) :- member(X=Y,Ejemplo), nodo(N,X=Y,raiz), jugarTenis(Ejemplo,N),!.~%
+jugarTenis(Ejemplo,N) :- member(X=Y,Ejemplo), nodo(N2,X=Y,N), jugarTenis(Ejemplo,N2).~%
+jugarTenis(_,N) :- nodo(hoja,[X/_],N), write(X)."))
+	)
+)
 
 (defun test-loop (lst)
   (loop for i in lst
