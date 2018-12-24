@@ -28,6 +28,16 @@
                        :if-does-not-exist :create)
     (format stream tree)))
 
+(defun tree2string (tree)
+  (setq counter 0)
+  (tree2string-aux tree ""))
+
+(defun tree2string-aux (tree str)
+  (setq tree-variable (string-downcase (string (car tree))))
+  (cond
+    ((or (atom (car (cdr tree))) (atom (car (cdr tree))))
+      (concatenate 'string str "(hoja,[" (string-downcase (string (car (cdr tree)))) "/1]," (write-to-string counter) ")"))))
+
 (defun report (tree data)
   (let ((positives (count-positives tree data)))
     (progn
