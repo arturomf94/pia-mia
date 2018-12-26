@@ -7,7 +7,6 @@
 (defvar *induce-on* nil "t enables the induce menu")
 (defvar *classify-on* nil "t enables the classify menu")
 (defvar *cross-validation-on* nil "t enables the cross-validation menu")
-(defvar *prune-on* nil "t enables the prune utility menu")
 (defvar *classified-int* ())
 (defvar *c-classified-int* ())
 
@@ -170,7 +169,7 @@
         (setf (title-pane-text (state-pane interface))
               (format nil "The setting ~s has been loaded"
                       path))
-        (setf *examples-on* t *attributes-on* t *induce-on* t *prune-on* t)))))
+        (setf *examples-on* t *attributes-on* t *induce-on* t)))))
 
 ;;; file/quit
 
