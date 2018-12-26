@@ -82,11 +82,6 @@ jugarTenis(_,N) :- nodo(hoja,[X/_],N), write(X)."))
 	)
 )
 
-(defun test-loop (lst)
-  (loop for i in lst
-      DO (print i)
-      (print lst)))
-
 (defun report (tree data)
   (let ((positives (count-positives tree data)))
     (progn
