@@ -259,12 +259,20 @@
 (defun classifyn-gui (data interface)
   (declare (ignore data))
   (progn
+    (setf nsi 0 nno 0)
     (setf new-lst (list (read-from-string (text-input-pane-text (ex1-pane interface)))
                         (read-from-string (text-input-pane-text (ex2-pane interface)))
                         (read-from-string (text-input-pane-text (ex3-pane interface)))
                         (read-from-string (text-input-pane-text (ex4-pane interface)))))
-    (setf new-l (classify-new-instance-votacion new-lst *k-validation-trees*))
-    (setf (text-input-pane-text (most-voted-class interface)) (princ-to-string new-l))
+    (setf new-l (loop for arbol in *k-validation-trees*
+                      collect (classify-new-instance new-lst arbol)))
+    (setf nsi (length (loop for class in new-l
+                            when (equal (string class) "SI")
+                            collect class)))
+    (setf nno (- (length new-l) nsi))
+    (if (> nsi nno)
+        (setf (text-input-pane-text (most-voted-class interface)) (princ-to-string 'si))
+      (setf (text-input-pane-text (most-voted-class interface)) (princ-to-string 'no)))))
 
 ;;; view/examples
 
