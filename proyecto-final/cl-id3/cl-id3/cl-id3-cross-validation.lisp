@@ -17,7 +17,7 @@
              (print "c-classified-int") ;;Agregada por mi
              (print *c-classified-int*)
              )))
-             (setf *best-tree* (nth (maximum-idx *c-classified-int*) *k-validation-trees*))
+             (setf *best-tree* (nth (select-bt *c-classified-int*) *k-validation-trees*))
              (print *best-tree*)
              ))
 (defun traducir2 (arbol padre etiqueta)
@@ -142,19 +142,12 @@ jugarTenis(_,N) :- nodo(hoja,[X/_],N), write(X)."))
    (if (member (first lst) (rest lst))
      (repetidos (rest lst) (adjoin (first lst) resultado))
      (repetidos (rest lst) resultado))))
-
-;;; maximum-idx es la Funcion para obtener el maximo elemento de una lista
-;;; y su indice (iota y maximum son complementos de maximum-idx)
-(defun maximum-idx (lst)
-  (cadr (multiple-value-list (maximum lst))))
-(defun maximum (lst)
-  (let ((max-idx 0)
-        (max-val (car lst)))
-  (mapcar #'(lambda (x y) (if (> x max-val)
-                            (progn
-                              (setf max-val x)
-                              (setf max-idx y))))
-          lst (iota (length lst)))
-  (values max-val max-idx)))
-(defun iota (n &optional (start-at 0))
-  (if (<= n 0) nil (cons start-at (iota (- n 1) (+ start-at 1)))))
+;;; Selecciona el mejor árbol
+(defun select-bt (lst)
+  (let ((cont 0) (index 0) (acc 0))
+   (progn
+     (loop for x in lst
+           do (progn
+                (when (> x acc) (and (setf acc x) (setf index cont)))
+                (setf cont (+ cont 1))))
+     index)))

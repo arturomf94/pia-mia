@@ -95,11 +95,11 @@
   (:layouts
    (main-layout column-layout '(panes state-pane))
    (panes row-layout '(info-pane tree-pane))
-   (titles column-layout '()) ;;; Aqu� van los multi-�rboles
+   (titles column-layout '()) ;;; Aquï¿œ van los multi-ï¿œrboles
    (matrix-pane row-layout '(titles confusion)
                 :title "Confusion Matrix" :x-gap '10 :y-gap '30
                 :title-position :frame :visible-min-width '200)
-   (confusion grid-layout '()) ;;; Aqu� va la matriz de confusi�n
+   (confusion grid-layout '()) ;;; Aquï¿œ va la matriz de confusiï¿œn
    (info-pane column-layout '(setting-pane id3-pane matrix-pane))
    (setting-pane grid-layout
 		 '("Source File" source-id-pane
@@ -125,13 +125,15 @@
 
 ;;; gui-cross-validation
 
+;;; Para el punto 1 se crea la función gui-cross-validation que emplea las funciones provistas en el archivo cl-id3-cross-validation.lisp elementalmente hace uso de los widgets de la interfaz grafica para obtener y mostrar los datos procesados, asimismo se definen variables globales que permiten la definición de aspectos importantes como el mejor árbol generado y el conjunto de arboles creados. De la misma forma esta función habilita herramientas que serán explicadas en el punto dos. También se calcula la eficiencia del arbol dividiendo los ejemplos correctamente clasificados entre todos loe ejemplos usados.
+
 (defun gui-cross-validation (data interface)
   (declare (ignore data))
   (progn
     ;; Toma K de la interfaz
     (setf k (text-input-pane-text (k-pane interface)))
-    (setf *classified-int* '() *c-classified-int* '())
-    ;; Lanza la funci�n con K
+    (setf *classified-int* '() *c-classified-int* '() *k-validation-trees* '() *classify-on* t)
+    ;; Lanza la funciï¿œn con K
     (cross-validation (parse-integer k))
     ;; Escribe el mejor arbol en un .txt
     (traducir *best-tree*)
@@ -212,30 +214,66 @@
        :title "CL-ID3:attributes"))
     (display (make-instance 'gui-domains))))
 
-;;
+;;; Se define la interfaz que ayuda a la clasificación de un nuevo ejemplo con los arboles generados en cross-validation.
+
 (defun gui-classify (data interface)
   (declare (ignore data interface))
   (define-interface new-classify-int () ()
     (:panes
-     (new-ex-pane text-input-pane
-                  :title "Nuevo ejemplo: "
-                  :accessor new-ex-pane
+     (ex1-pane text-input-pane
+                  :title "Cielo: "
+                  :accessor ex1-pane
+                  :text ""
+                  :enabled t)
+     (ex2-pane text-input-pane
+                  :title "Temperatura: "
+                  :accessor ex2-pane
+                  :text ""
+                  :enabled t)
+     (ex3-pane text-input-pane
+                  :title "Humedad: "
+                  :accessor ex3-pane
+                  :text ""
+                  :enabled t)
+     (ex4-pane text-input-pane
+                  :title "Viento: "
+                  :accessor ex4-pane
                   :text ""
                   :enabled t)
      (most-voted-class text-input-pane
-                       :title "Clase m�s votada: "
+                       :title "Clase votada: "
                        :accessor most-voted-class
                        :text ""
                        :enabled NIL)
      (bttn-classify push-button
                    :text "Clasificar"
-                   :callback 'classify-new-instance2)
+                   :callback 'classifyn-gui)
      (bttn-quit push-button
                     :text "Cerarr"
                     :callback 'gui-quit))
     (:default-initargs
        :title "CL-ID3: Classify"))
     (display (make-instance 'new-classify-int)))
+
+;;; Función usada para enlazar la interfaz y las funciones de clasificación provistas
+
+(defun classifyn-gui (data interface)
+  (declare (ignore data))
+  (progn
+    (setf nsi 0 nno 0)
+    (setf new-lst (list (read-from-string (text-input-pane-text (ex1-pane interface)))
+                        (read-from-string (text-input-pane-text (ex2-pane interface)))
+                        (read-from-string (text-input-pane-text (ex3-pane interface)))
+                        (read-from-string (text-input-pane-text (ex4-pane interface)))))
+    (setf new-l (loop for arbol in *k-validation-trees*
+                      collect (classify-new-instance new-lst arbol)))
+    (setf nsi (length (loop for class in new-l
+                            when (equal (string class) "SI")
+                            collect class)))
+    (setf nno (- (length new-l) nsi))
+    (if (> nsi nno)
+        (setf (text-input-pane-text (most-voted-class interface)) (princ-to-string 'si))
+      (setf (text-input-pane-text (most-voted-class interface)) (princ-to-string 'no)))))
 
 ;;; view/examples
 
@@ -332,7 +370,7 @@
   "It displays the about message in INTERFACE"
   (declare (ignore data interface))
   (display-message
-   "CL-ID3~%~%Universidad Veracruzana~%Departamento de Inteligencia Artificial~%Sebasti�n Camacho No 5~%Xalapa, Ver., M�xico 91000~%http://www.uv.mx/aguerra~%aguerra@uv.mx"))
+   "CL-ID3~%~%Universidad Veracruzana~%Departamento de Inteligencia Artificial~%Sebastiï¿œn Camacho No 5~%Xalapa, Ver., Mï¿œxico 91000~%http://www.uv.mx/aguerra~%aguerra@uv.mx"))
 
 ;;; main call
 
