@@ -20,66 +20,89 @@
              (setf *best-tree* (nth (select-bt *c-classified-int*) *k-validation-trees*))
              (print *best-tree*)
              ))
+
 (defun traducir2 (arbol padre etiqueta)
 
-	(let ((*print-case* :downcase))
-	(progn
-	(if (listp arbol)
-		(loop for i in (cdr (crear-nodos arbol)) do
-			(progn
-			(if (eq padre 0)
-				(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
-					:direction :output
-					:if-exists :append
-					:if-does-not-exist :create)
-					(format str "nodo(~A,~A=~A,raiz).~%" (setf etiqueta (+ etiqueta 1)) (car (crear-nodos arbol)) i))
-				(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
-					:direction :output
-					:if-exists :append
-					:if-does-not-exist :create)
-					(format str "nodo(~A,~A=~A,~A).~%" (setf etiqueta (+ etiqueta 1)) (car (crear-nodos arbol)) i padre))
-			)
-			(loop for j in (cdr arbol) do
-				(if (equal i (car j))
-					(progn
-					(if (> (length j) 1) (traducir2 (cadr j) etiqueta etiqueta) (traducir2 (car j) etiqueta etiqueta))
-					(setf etiqueta (+ etiqueta 1))
-					)
-				)
-			)
-			)
-		)
-		(progn
-		(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
-					:direction :output
-					:if-exists :append
-					:if-does-not-exist :create)
-		(format str "nodo(hoja,[~A/_],~A). ~%" arbol etiqueta))
-		)
-	)
-	)
-	)
+   ;Hacer que los símbolos se muestren en minúsculas.
+   (let ((*print-case* :downcase))
+
+   ;Verifica si el argumento es un árbol o un SI/NO.
+   (if (listp arbol)
+
+      ;Hacer un loop en los valores del atributo en cuestión para generar los nodos del árbol de Prolog.
+      (loop for i in (cdr (atributo-valores arbol)) do
+         (progn
+
+         ;Escribir los nodos del árbol de Prolog.
+         (if (eq padre 0)
+            (escribir (setf etiqueta (+ etiqueta 1)) (car (atributo-valores arbol)) i 'raiz)
+            (escribir (setf etiqueta (+ etiqueta 1)) (car (atributo-valores arbol)) i padre)
+         )
+
+         ;Hacer un loop en los subárboles que están después de cada valor del atributo correspondiente
+         ;para aplicarles esta misma función de manera recursiva.
+         (loop for j in (cdr arbol) do
+            (if (equal i (car j))
+               (if (> (length j) 1)
+                  (setf etiqueta (traducir2 (cadr j) etiqueta etiqueta))
+                  (setf etiqueta (traducir2 (car j) etiqueta etiqueta))
+               )
+            )
+         )
+         )
+         ;Retornar la etiqueta del último nodo creado para que su valor no se pierda después de cada
+         ;llamada recursiva.
+         finally (return etiqueta)
+      )
+      (progn
+      ;Si el argumento es de la forma SI/NO escribir un nodo hoja.
+      (escribir 'a arbol 'c etiqueta)
+      etiqueta
+      )
+   )
+   )
 )
 
-(defun crear-nodos (lista)
-	(loop for i in lista collect
-		(if (listp i) (car i) i)
-	)
+
+;Función que a partir de un árbol, crea una lista con el atributo "raíz" del árbol actual, seguido de sus valores.
+
+(defun atributo-valores (lista)
+   (loop for i in lista collect
+      (if (listp i) (car i) i)
+   )
 )
+
+;Función para escribir los nodos en el formato de Prolog.
+
+(defun escribir (a b c d)
+
+   (with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+               :direction :output
+               :if-exists :append
+               :if-does-not-exist :create)
+     (print b)
+      (if (or (equal b 'si) (equal b 'no))
+         (format str "nodo(hoja,[~A/_],~A).~%" b d)
+         (format str "nodo(~A,~A=~A,~A).~%" a b c d)
+      )
+   )
+)
+
+;Función que sirve como interfaz de "traducir2" y escribe el programa de Prolog que clasifica.
 
 (defun traducir (arbol)
 
-	(progn
-	(traducir2 arbol 0 0)
-	(with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
-					:direction :output
-					:if-exists :append
-					:if-does-not-exist :create)
-	(format str "~%~%%Ejemplo:[cielo=soleado,temperatura=alta,humedad=alta,viento=debil].~%
+   (progn
+   (traducir2 arbol 0 0)
+   (with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+               :direction :output
+               :if-exists :append
+               :if-does-not-exist :create)
+   (format str "~%~%%Ejemplo:[cielo=soleado,temperatura=alta,humedad=alta,viento=debil].~%
 jugarTenis(Ejemplo) :- member(X=Y,Ejemplo), nodo(N,X=Y,raiz), jugarTenis(Ejemplo,N),!.~%
 jugarTenis(Ejemplo,N) :- member(X=Y,Ejemplo), nodo(N2,X=Y,N), jugarTenis(Ejemplo,N2).~%
 jugarTenis(_,N) :- nodo(hoja,[X/_],N), write(X)."))
-	)
+   )
 )
 
 (defun report (tree data)
