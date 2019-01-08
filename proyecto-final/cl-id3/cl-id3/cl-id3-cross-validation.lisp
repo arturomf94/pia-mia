@@ -74,7 +74,7 @@
 
 (defun escribir (a b c d)
 
-   (with-open-file (str "/home/j6/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+   (with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
                :direction :output
                :if-exists :append
                :if-does-not-exist :create)
@@ -92,7 +92,7 @@
 
    (progn
    (traducir2 arbol 0 0)
-   (with-open-file (str "/home/j6/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
+   (with-open-file (str "~/quicklisp/local-projects/cl-id3/cl-id3/arbol.pl"
                :direction :output
                :if-exists :append
                :if-does-not-exist :create)
